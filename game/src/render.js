@@ -39,6 +39,7 @@ export function render(ctx, state, chef, ui) {
   drawHud(ctx, state, ui);
   drawHelp(ctx, state, chef, ui);
   drawMessage(ctx, state);
+  drawRushBanner(ctx, state);
   if (state.screen === 'pause') drawPause(ctx);
   if (state.screen === 'over') drawGameOver(ctx, state, ui);
 }
@@ -113,12 +114,14 @@ function drawBoard(ctx, state) {
       drawIngredient(ctx, id, r.x + 36 + i * 48, r.y + 50, 40, false);
     });
     text(ctx, moneyStr(order.recipe.price), r.x + r.w - 14, r.y + 26, 18, '#2e7d32', 'right');
+    const pat = order.patience || { label: 'BIASA', color: '#8a6d1a' };
+    text(ctx, pat.label, r.x + r.w - 14, r.y + 44, 11, pat.color, 'right');
     // Timer bar.
     ctx.fillStyle = '#e0d6c0';
     roundRect(ctx, r.x + 14, r.y + 66, r.w - 28, 10, 5); ctx.fill();
     ctx.fillStyle = urgent ? '#d43d2a' : frac < 0.55 ? '#f0a020' : '#43a047';
     if (frac > 0) roundRect(ctx, r.x + 14, r.y + 66, (r.w - 28) * frac, 10, 5); ctx.fill();
-    text(ctx, `${Math.ceil(order.timeLeft)}s`, r.x + r.w - 14, r.y + 62, 14, urgent ? '#d43d2a' : '#6d5a3e', 'right');
+    text(ctx, `${Math.ceil(order.timeLeft)}s`, r.x + r.w - 14, r.y + 62, 16, urgent ? '#d43d2a' : '#6d5a3e', 'right');
     if (urgent && Math.floor(state.elapsed * 2) % 2 === 0) {
       ctx.fillStyle = '#d43d2a';
       ellipse(ctx, r.x + r.w - 22, r.y + 12, 9, 9); ctx.fill();
@@ -212,15 +215,16 @@ function drawPlateStation(ctx, state, ui) {
   ctx.fillStyle = '#7a5a34';
   roundRect(ctx, p.x, p.y, p.w, p.h, 12); ctx.fill();
   stationHeader(ctx, p, 'PIRING RAKIT', hover);
+  const pop = state.elapsed < state.platePopUntil ? 1 + 0.12 * ((state.platePopUntil - state.elapsed) / 0.3) : 1;
   ctx.fillStyle = '#e8dcc2';
-  ellipse(ctx, p.x + p.w / 2, p.y + 118, 92, 40); ctx.fill();
+  ellipse(ctx, p.x + p.w / 2, p.y + 118, 92 * pop, 40 * pop); ctx.fill();
   // Dish count under the header: the chef stands in front of the station's
   // bottom edge, so state text down there is hidden whenever he is at work.
   text(ctx, `${state.dish.length} bahan di piring`, p.x + p.w / 2, p.y + 54, 13, '#ffe9c4', 'center');
   if (state.dish.length === 0) {
     text(ctx, 'Piring kosong', p.x + p.w / 2, p.y + 124, 15, '#8a7a5e', 'center');
   } else {
-    drawPlate(ctx, p.x + p.w / 2, p.y + 116, 140, state.dish);
+    drawPlate(ctx, p.x + p.w / 2, p.y + 116, 140 * pop, state.dish);
   }
   text(ctx, 'Klik: taruh bahan di piring', p.x + 12, p.y + p.h - 8, 12, '#ffe9c4');
 }
@@ -324,7 +328,12 @@ function drawHud(ctx, state, ui) {
   const mm = Math.floor(state.timeLeft / 60);
   const ss = Math.floor(state.timeLeft % 60).toString().padStart(2, '0');
   const lowTime = state.timeLeft <= 30;
-  text(ctx, `⏱ ${mm}:${ss}`, 810, 35, 26, lowTime ? '#ff8a7a' : '#ffffff', 'center');
+  const clockSize = lowTime ? 26 * (1 + 0.09 * Math.sin(state.elapsed * 6)) : 26;
+  if (lowTime) {
+    ctx.fillStyle = 'rgba(212,61,42,.35)';
+    roundRect(ctx, 748, 8, 124, 40, 10); ctx.fill();
+  }
+  text(ctx, `⏱ ${mm}:${ss}`, 810, 35, clockSize, lowTime ? '#ff8a7a' : '#ffffff', 'center');
   text(ctx, `Tersaji: ${state.served}  •  Kombo: x${Math.max(1, state.combo)}`, 900, 33, 15, '#ffffff');
   // Sound + pause buttons.
   ui.soundBtn = { x: 1096, y: 6, w: 76, h: 42 };
@@ -367,6 +376,16 @@ function drawMessage(ctx, state) {
   ctx.lineWidth = 1.5;
   roundRect(ctx, 640 - w / 2, 344, w, 26, 9); ctx.stroke();
   text(ctx, msg, 640, 362, 15, state.messageColor || '#ffe9c4', 'center');
+}
+
+function drawRushBanner(ctx, state) {
+  if (state.screen !== 'play' || state.elapsed >= state.rushBannerUntil) return;
+  ctx.fillStyle = 'rgba(212,61,42,.95)';
+  roundRect(ctx, 350, 158, 580, 50, 12); ctx.fill();
+  ctx.strokeStyle = '#ffd54a';
+  ctx.lineWidth = 3;
+  roundRect(ctx, 350, 158, 580, 50, 12); ctx.stroke();
+  text(ctx, '🔥  JAM SIBUK! Tip +50%  🔥', 640, 191, 28, '#ffffff', 'center');
 }
 
 function drawTitle(ctx, state, ui) {

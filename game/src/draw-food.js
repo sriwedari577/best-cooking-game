@@ -144,6 +144,29 @@ export function drawIngredient(ctx, id, x, y, size, cooked, burnt) {
     ctx.fillStyle = c.accent;
     for (const [dx, dy] of [[-8, -2], [6, -4], [2, 6]]) ellipse(ctx, dx * s, dy * s, 2 * s, 2 * s), ctx.fill();
   }
+  // Garnish pass: steam, shine and grill marks over every item, so the
+  // food reads as hot and worth serving wherever it is drawn.
+  if (!burnt && size >= 44) {
+    ctx.strokeStyle = 'rgba(255,255,255,.55)';
+    ctx.lineWidth = 2 * s;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-14 * s, -20 * s);
+    ctx.quadraticCurveTo(-10 * s, -26 * s, -14 * s, -32 * s);
+    ctx.moveTo(10 * s, -20 * s);
+    ctx.quadraticCurveTo(14 * s, -26 * s, 10 * s, -32 * s);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,.5)';
+    ellipse(ctx, -12 * s, -8 * s, 6 * s, 3 * s); ctx.fill();
+  }
+  if (cooked && !burnt && (id === 'ayam' || id === 'sate' || id === 'telur')) {
+    ctx.strokeStyle = 'rgba(90,45,10,.65)';
+    ctx.lineWidth = 2.5 * s;
+    ctx.beginPath();
+    ctx.moveTo(-16 * s, -6 * s); ctx.lineTo(16 * s, -6 * s);
+    ctx.moveTo(-16 * s, 4 * s); ctx.lineTo(16 * s, 4 * s);
+    ctx.stroke();
+  }
   ctx.restore();
 }
 
@@ -166,6 +189,19 @@ export function drawPlate(ctx, x, y, size, items) {
     const [dx, dy] = spots[i % spots.length];
     drawIngredient(ctx, item.id, dx * s, dy * s, 52 * s, item.cooked, item.burnt);
   });
+  // Sauce drizzle and herb garnish over the finished plate.
+  ctx.strokeStyle = '#c98a2e';
+  ctx.lineWidth = 2.5 * s;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(-34 * s, -6 * s);
+  ctx.quadraticCurveTo(-10 * s, -14 * s, 12 * s, -4 * s);
+  ctx.quadraticCurveTo(26 * s, 2 * s, 36 * s, -6 * s);
+  ctx.stroke();
+  ctx.fillStyle = '#4d8a38';
+  ellipse(ctx, -30 * s, 6 * s, 3 * s, 2 * s); ctx.fill();
+  ellipse(ctx, 28 * s, -10 * s, 3 * s, 2 * s); ctx.fill();
+  ellipse(ctx, 4 * s, 8 * s, 3 * s, 2 * s); ctx.fill();
   ctx.restore();
 }
 

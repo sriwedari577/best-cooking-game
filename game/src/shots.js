@@ -11,13 +11,14 @@
 // main loop paints twice and sets window.__shotReady for the capture.
 
 import { RECIPES } from './config.js';
+import { patienceById } from './state.js';
 
 function findRecipe(id) {
   return RECIPES.find((r) => r.id === id);
 }
 
-function makeOrder(id, recipeId, timeLeft, total, slot) {
-  return { id, recipe: findRecipe(recipeId), timeLeft, total, slot };
+function makeOrder(id, recipeId, timeLeft, total, slot, patienceId) {
+  return { id, recipe: findRecipe(recipeId), timeLeft, total, slot, patience: patienceById(patienceId || 'biasa') };
 }
 
 export function stageShot(state, chef, name) {
@@ -46,9 +47,9 @@ export function stageShot(state, chef, name) {
     // the grill working, the chef carrying the last ingredient, and a
     // finished plate waiting at the serve window.
     state.orders = [
-      makeOrder(1, 'nasi-ayam', 38, 45, 0),
-      makeOrder(2, 'mie-telur', 21, 45, 1),
-      makeOrder(3, 'sate-nasi', 30, 45, 2),
+      makeOrder(1, 'nasi-ayam', 38, 45, 0, 'biasa'),
+      makeOrder(2, 'mie-telur', 21, 45, 1, 'buru'),
+      makeOrder(3, 'sate-nasi', 30, 45, 2, 'santai'),
     ];
     state.dish = [
       { id: 'nasi', cooked: false, burnt: false },
@@ -68,7 +69,7 @@ export function stageShot(state, chef, name) {
       until: 99999,
       name: 'Mie Telur Sayur',
     };
-    chef.x = 862;
+    chef.x = 700;
     chef.y = 388;
     chef.facing = 1;
   } else if (name === 'assembly') {
@@ -90,10 +91,17 @@ export function stageShot(state, chef, name) {
   } else if (name === 'serve') {
     // The serve moment: chef at the window, bell ringing, the finished
     // plate on the counter, the payout popping.
-    state.orders = [makeOrder(1, 'sate-mie', 26, 45, 0)];
+    state.orders = [
+      makeOrder(1, 'sate-mie', 26, 45, 0, 'biasa'),
+      makeOrder(2, 'nasi-goreng', 38, 45, 1, 'santai'),
+      makeOrder(3, 'mie-kerupuk', 33, 45, 2, 'buru'),
+    ];
     state.dish = [];
     state.hand = null;
-    state.grill = [null, null];
+    state.grill = [
+      { id: 'telur', progress: 3.4, done: false, burnt: false },
+      null,
+    ];
     state.servedDisplay = {
       items: [
         { id: 'mie', cooked: false, burnt: false },
@@ -110,7 +118,7 @@ export function stageShot(state, chef, name) {
     state.money = 109000;
     state.combo = 3;
     state.served = 6;
-    chef.x = 1138;
+    chef.x = 1162;
     chef.y = 388;
     chef.facing = -1;
   } else if (name === 'rush') {
@@ -120,9 +128,9 @@ export function stageShot(state, chef, name) {
     state.timeLeft = 47;
     state.rush = true;
     state.orders = [
-      makeOrder(1, 'mie-ayam', 8, 34, 0),
-      makeOrder(2, 'nasi-telur', 24, 34, 1),
-      makeOrder(3, 'sate-mie', 29, 34, 2),
+      makeOrder(1, 'mie-ayam', 8, 34, 0, 'buru'),
+      makeOrder(2, 'nasi-telur', 24, 34, 1, 'biasa'),
+      makeOrder(3, 'sate-mie', 29, 34, 2, 'santai'),
     ];
     state.dish = [
       { id: 'mie', cooked: false, burnt: false },
@@ -131,8 +139,18 @@ export function stageShot(state, chef, name) {
     state.hand = { id: 'sayur', cooked: false, burnt: false };
     state.grill = [
       { id: 'sate', progress: 2.2, done: false, burnt: false },
-      null,
+      { id: 'ayam', progress: 4.5, done: true, burnt: false },
     ];
+    state.servedDisplay = {
+      items: [
+        { id: 'mie', cooked: false, burnt: false },
+        { id: 'ayam', cooked: true, burnt: false },
+        { id: 'sayur', cooked: false, burnt: false },
+      ],
+      until: 99999,
+      name: 'Mie Ayam Sayur',
+    };
+    state.rushBannerUntil = 9999;
     state.message = 'JAM SIBUK! Pesanan lebih cepat, tip naik 50%!';
     state.messageUntil = 9999;
     state.messageColor = '#ffd54a';
@@ -140,7 +158,32 @@ export function stageShot(state, chef, name) {
     state.hearts = 2;
     state.combo = 4;
     state.served = 8;
-    chef.x = 862;
+    chef.x = 700;
+    chef.y = 388;
+    chef.facing = 1;
+  } else if (name === 'depth') {
+    // Depth: three tickets at once including a four-item special, both
+    // grill slots working, a three-item dish mid-assembly, chef carrying
+    // the final item from between the stations so the plate stays visible.
+    state.orders = [
+      makeOrder(1, 'nasi-goreng', 40, 45, 0, 'buru'),
+      makeOrder(2, 'mie-komplit', 28, 45, 1, 'biasa'),
+      makeOrder(3, 'sayur-sambal', 18, 45, 2, 'santai'),
+    ];
+    state.dish = [
+      { id: 'nasi', cooked: false, burnt: false },
+      { id: 'ayam', cooked: true, burnt: false },
+      { id: 'telur', cooked: true, burnt: false },
+    ];
+    state.hand = { id: 'sambal', cooked: false, burnt: false };
+    state.grill = [
+      { id: 'ayam', progress: 4.5, done: true, burnt: false },
+      { id: 'sate', progress: 2.6, done: false, burnt: false },
+    ];
+    state.money = 132000;
+    state.combo = 5;
+    state.served = 9;
+    chef.x = 700;
     chef.y = 388;
     chef.facing = 1;
   } else {

@@ -83,6 +83,7 @@ export function addToPlate(state, sfx) {
     return false;
   }
   state.dish.push({ id: state.hand.id, cooked: state.hand.cooked, burnt: false });
+  state.platePopUntil = state.elapsed + 0.3;
   burst(state, 862, 250, '#ffe9a8', 8);
   state.hand = null;
   if (sfx) sfx.chop();
@@ -141,7 +142,9 @@ export function serveDish(state, sfx) {
   if (state.rush) tip = Math.round(tip * 1.5);
   state.combo += 1;
   state.bestCombo = Math.max(state.bestCombo, state.combo);
-  const comboBonus = (state.combo - 1) * 1000;
+  const comboBonus = (state.combo - 1) * (state.rush ? 1500 : 1000);
+  if (state.combo === 3) popup(state, 640, 120, 'KOMBO x3! Bonus beruntun!', '#ffd54a');
+  if (state.combo === 5) popup(state, 640, 120, 'KOMBO x5! STREAK PANAS!', '#ff8a5c');
   const earned = match.recipe.price + tip + comboBonus;
   state.money += earned;
   state.served += 1;

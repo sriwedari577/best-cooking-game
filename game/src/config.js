@@ -14,6 +14,7 @@ export const TUNING = {
   rushOrderSeconds: 34,
   spawnSeconds: 12,
   rushSpawnSeconds: 8,
+  rushBigChance: 0.5,
   rushAtSecondsLeft: 60,
   grillSeconds: 4.5,
   burnSeconds: 9,
@@ -44,6 +45,10 @@ export const RECIPES = [
   { id: 'nasi-telur', name: 'Nasi Telur Kerupuk', items: ['nasi', 'telur', 'kerupuk'], price: 13000 },
   { id: 'mie-ayam',   name: 'Mie Ayam Sayur',     items: ['mie', 'ayam', 'sayur'],    price: 16000 },
   { id: 'sate-mie',   name: 'Sate Mie Sambal',    items: ['mie', 'sate', 'sambal'],   price: 17000 },
+  { id: 'nasi-goreng', name: 'Nasi Goreng Spesial', items: ['nasi', 'ayam', 'telur', 'sambal'], price: 22000 },
+  { id: 'mie-komplit',  name: 'Mie Komplit',        items: ['mie', 'sate', 'telur', 'sayur'],  price: 21000 },
+  { id: 'sayur-sambal', name: 'Sayur Sambal Kerupuk', items: ['sayur', 'sambal', 'kerupuk'], price: 12000 },
+  { id: 'mie-kerupuk',  name: 'Mie Kerupuk Sambal', items: ['mie', 'kerupuk', 'sambal'],      price: 13000 },
 ];
 
 // Station geometry (canvas coordinates, 1280x480).

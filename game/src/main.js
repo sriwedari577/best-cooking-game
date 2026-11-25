@@ -149,6 +149,13 @@ function frame(now) {
     }
     tickSpawn(state, dt);
     tickClock(state, dt);
+    if (state.timeLeft <= 10 && state.timeLeft > 0) {
+      const sec = Math.ceil(state.timeLeft);
+      if (sec !== state.lastTickSecond) {
+        state.lastTickSecond = sec;
+        sfx.tick();
+      }
+    }
     tickFx(state, dt);
     checkGameOver(state);
     const cooking = state.grill.some((s) => s && !s.done);

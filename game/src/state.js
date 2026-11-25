@@ -32,6 +32,9 @@ export function createState(rng) {
     particles: [], // { x, y, vx, vy, life, age, color, size }
     servedDisplay: null, // { items, until } — finished plate shown at the window
     bellUntil: 0,
+    rushBannerUntil: 0,
+    platePopUntil: 0,
+    lastTickSecond: -1,
     stats: { grilled: 0, burnt: 0, trashed: 0 },
     rng: rng || Math.random,
     selected: 'nasi',
@@ -46,12 +49,36 @@ export function orderSeconds(state) {
   return rushActive(state) ? TUNING.rushOrderSeconds : TUNING.orderSeconds;
 }
 
+// Patience: every ticket carries one. It scales the ticket's countdown
+// and is drawn as a badge, so the player plans around the impatient ones.
+export const PATIENCE = [
+  { id: 'santai', label: 'SANTAI', factor: 1.25, color: '#2e7d32' },
+  { id: 'biasa', label: 'BIASA', factor: 1.0, color: '#8a6d1a' },
+  { id: 'buru', label: 'BURU-BURU', factor: 0.8, color: '#b3261e' },
+];
+
+export function patienceById(id) {
+  return PATIENCE.find((p) => p.id === id) || PATIENCE[1];
+}
+
+function pickPatience(rng) {
+  const roll = rng();
+  if (roll < 0.25) return PATIENCE[0];
+  if (roll < 0.75) return PATIENCE[1];
+  return PATIENCE[2];
+}
+
 export function spawnOrder(state, recipe) {
   if (state.orders.length >= TUNING.maxOrders) return null;
-  const picked = recipe || pickFrom(state.rng, RECIPES);
-  const total = orderSeconds(state);
+  // During the rush, half the spawns are the big four-item specials: more
+  // planning, same two grill slots, no extra chores.
+  const big = RECIPES.filter((r) => r.items.length === 4);
+  const pool = rushActive(state) && big.length > 0 && state.rng() < TUNING.rushBigChance ? big : RECIPES;
+  const picked = recipe || pickFrom(state.rng, pool);
+  const patience = pickPatience(state.rng);
+  const total = Math.round(orderSeconds(state) * patience.factor);
   const slot = firstFreeSlot(state);
-  const order = { id: nextOrderId++, recipe: picked, timeLeft: total, total, slot };
+  const order = { id: nextOrderId++, recipe: picked, timeLeft: total, total, slot, patience };
   state.orders.push(order);
   return order;
 }
@@ -117,6 +144,7 @@ export function tickClock(state, dt) {
   state.elapsed += dt;
   if (!state.rush && rushActive(state)) {
     state.rush = true;
+    state.rushBannerUntil = state.elapsed + 2.4;
     say(state, 'JAM SIBUK! Pesanan lebih cepat, tip naik 50%!', '#ffd54a');
   }
   if (state.timeLeft <= 0) {
