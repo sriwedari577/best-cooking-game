@@ -39,11 +39,15 @@ their timers shorten, and tips grow 50%.
 ## Menu
 
 Eight ingredients — nasi, mie, ayam, sate, telur, sayur, sambal,
-kerupuk — combine into six dishes: Nasi Ayam Sambal, Mie Telur Sayur,
-Sate Nasi Kerupuk, Nasi Telur Kerupuk, Mie Ayam Sayur, and Sate Mie
-Sambal. Recipes share ingredients, so consecutive tickets pull the chef
-between the counter, the grill and the plate in different orders, and
-grilling two proteins at once is usually the fastest route.
+kerupuk — combine into ten dishes: Nasi Ayam Sambal, Mie Telur Sayur,
+Sate Nasi Kerupuk, Nasi Telur Kerupuk, Mie Ayam Sayur, Sate Mie
+Sambal, plus four-item specials (Nasi Goreng Spesial, Mie Komplit) and
+quick plates (Sayur Sambal Kerupuk, Mie Kerupuk Sambal). Recipes share
+ingredients, so consecutive tickets pull the chef between the counter,
+the grill and the plate in different orders, and grilling two proteins
+at once is usually the fastest route. Every ticket carries a patience
+badge — SANTAI, BIASA or BURU-BURU — and the closing rush favours the
+big four-item specials. Serving in a row builds a combo bonus.
 
 ## Layout
 
@@ -64,7 +68,8 @@ grilling two proteins at once is usually the fastest route.
   (`?shot=cover|assembly|serve|rush|title`).
 - `main.ts` — hands `game/` and `screenshots/` in with a dossier.
 - `screenshots/` — real renders of this game's own code in a browser:
-  the full kitchen, the title screen, the closing rush, and a serve.
+  the full kitchen, a deep multi-order moment, the closing rush, and a
+  serve.
 
 ## Run it
 
